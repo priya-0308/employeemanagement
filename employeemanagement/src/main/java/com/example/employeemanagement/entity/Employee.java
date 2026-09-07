@@ -17,26 +17,26 @@ public class Employee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;                  // 1
+    private Long id;                 
 
     @Column(nullable = false)
-    private String firstName;         // 2
+    private String firstName;        
 
     @Column(nullable = false)
-    private String lastName;          // 3
+    private String lastName;         
 
     @Column(nullable = false, unique = true)
-    private String email;             // 4
+    private String email;            
 
-    private String phoneNumber;       // 5
-
-    @Column(nullable = false)
-    private String department;        // 6
-
-    private String jobTitle;          // 7
+    private String phoneNumber;       
 
     @Column(nullable = false)
-    private BigDecimal salary;        // 8
+    private String department;        
 
-    private LocalDate hireDate;       // 9
+    private String jobTitle;         
+
+    @Column(nullable = false)
+    private BigDecimal salary;       
+
+    private LocalDate hireDate;       
 }
