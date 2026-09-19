@@ -19,3 +19,8 @@ spring:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+jwt:
+  # Replace this value with a long, random secret in every deployed environment.
+  secret: change-this-development-secret-to-a-long-random-value-at-least-256-bits
+  expiration-ms: 3600000
