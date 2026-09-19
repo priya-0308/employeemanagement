@@ -10,11 +10,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EmployeeResponseDto> getAllEmployees() {
+        return employeeRepository.findAll().stream()
+                .map(this::mapToResponseDto)
+                .toList();
+    }
 
     @Override
     @Transactional

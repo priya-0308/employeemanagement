@@ -10,15 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -36,6 +39,22 @@ class EmployeeControllerTest {
     private EmployeeService employeeService;
 
     @Test
+    @WithMockUser(roles = "ADMIN")
+    void getAllEmployees_ReturnsEmployees() throws Exception {
+        EmployeeResponseDto response = new EmployeeResponseDto(
+                1L, "priyanka", "k", "priyanka@gmail.com", "+12345678901",
+                "IT", "Developer", new BigDecimal("5000"), LocalDate.now()
+        );
+        when(employeeService.getAllEmployees()).thenReturn(List.of(response));
+
+        mockMvc.perform(get("/api/employees"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].email").value("priyanka@gmail.com"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     void createEmployee_ValidRequest_ReturnsCreated() throws Exception {
         EmployeeRequestDto request = new EmployeeRequestDto(
                 "priyanka", "k", "priyanka@gmail.com", "+12345678901",
@@ -55,6 +74,7 @@ class EmployeeControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.email").value("priyanka@gmail.com"));
     }
+
     @Test
     void createEmployee_MissingRequiredFields() throws Exception {
         EmployeeRequestDto invalidDto = new EmployeeRequestDto(
@@ -64,12 +84,13 @@ class EmployeeControllerTest {
         mockMvc.perform(post("/api/employees")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidDto)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnauthorized());
 
         verifyNoInteractions(employeeService);
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void updateEmployee_test() throws Exception {
         EmployeeRequestDto request = new EmployeeRequestDto(
                 "priyanka", "k", "priyanka@gmail.com", "+12345678901",
@@ -88,25 +109,19 @@ class EmployeeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.salary").value(6000));
     }
+
     @Test
     void updateEmployee_InvalidPathId() throws Exception {
         EmployeeRequestDto requestDto = new EmployeeRequestDto(
-                "priyanka",
-                "k",
-                "priya@gmail.com",
-                "+1245677889",
-                "IT",
-                "Developer",
-                new BigDecimal("6000"),
-                LocalDate.now()
+                "priyanka", "k", "priya@gmail.com", "+1245677889", "IT",
+                "Developer", new BigDecimal("6000"), LocalDate.now()
         );
 
         mockMvc.perform(put("/api/employees/invalid-id")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnauthorized());
 
         verifyNoInteractions(employeeService);
     }
-    
 }

@@ -9,7 +9,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -19,7 +22,15 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
+    @GetMapping
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @Operation(summary = "Get all employees")
+    public ResponseEntity<List<EmployeeResponseDto>> getAllEmployees() {
+        return ResponseEntity.ok(employeeService.getAllEmployees());
+    }
+
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create a new employee")
     public ResponseEntity<EmployeeResponseDto> createEmployee(@Valid @RequestBody EmployeeRequestDto requestDto) {
         EmployeeResponseDto created = employeeService.createEmployee(requestDto);
@@ -27,6 +38,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update an existing employee by ID")
     public ResponseEntity<EmployeeResponseDto> updateEmployee(
             @PathVariable Long id,
