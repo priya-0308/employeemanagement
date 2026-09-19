@@ -27,6 +27,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public EmployeeResponseDto getEmployeeById(Long id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + id));
+        return mapToResponseDto(employee);
+    }
+
+    @Override
     @Transactional
     public EmployeeResponseDto createEmployee(EmployeeRequestDto dto) {
         if (employeeRepository.existsByEmail(dto.email())) {
