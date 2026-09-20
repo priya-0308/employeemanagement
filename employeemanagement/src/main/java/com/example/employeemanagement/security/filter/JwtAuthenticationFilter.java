@@ -1,7 +1,6 @@
 package com.example.employeemanagement.security.filter;
 
 import com.example.employeemanagement.security.service.JwtService;
-import com.example.employeemanagement.security.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
