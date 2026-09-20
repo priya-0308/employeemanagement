@@ -23,5 +23,5 @@ springdoc:
 
 jwt:
   # Replace this value with a long, random secret in every deployed environment.
-  secret: change-this-development-secret-to-a-long-random-value-at-least-256-bits
+  secret: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
   expiration-ms: 3600000
