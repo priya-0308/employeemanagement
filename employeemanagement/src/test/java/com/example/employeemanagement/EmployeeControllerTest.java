@@ -75,13 +75,14 @@ class EmployeeControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void createEmployee_MissingRequiredFields() throws Exception {
         EmployeeRequestDto invalidDto = new EmployeeRequestDto("", "", "", null, "", "", null, null);
 
         mockMvc.perform(post("/api/employees")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidDto)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isBadRequest());
 
         verifyNoInteractions(employeeService);
     }
@@ -104,9 +105,15 @@ class EmployeeControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void updateEmployee_InvalidPathId() throws Exception {
-        mockMvc.perform(put("/api/employees/update/invalid-id"))
-                .andExpect(status().isUnauthorized());
+        EmployeeRequestDto requestDto = employeeRequest(new BigDecimal("6000"));
+
+        mockMvc.perform(put("/api/employees/update/invalid-id")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isBadRequest());
+
         verifyNoInteractions(employeeService);
     }
 
