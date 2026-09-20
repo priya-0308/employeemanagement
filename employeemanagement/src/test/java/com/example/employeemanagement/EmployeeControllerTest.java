@@ -19,6 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -49,12 +50,14 @@ class EmployeeControllerTest {
         when(employeeService.createEmployee(any())).thenReturn(response);
 
         mockMvc.perform(post("/api/employees")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.email").value("priyanka@gmail.com"));
     }
+
     @Test
     void createEmployee_MissingRequiredFields() throws Exception {
         EmployeeRequestDto invalidDto = new EmployeeRequestDto(
@@ -62,6 +65,7 @@ class EmployeeControllerTest {
         );
 
         mockMvc.perform(post("/api/employees")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidDto)))
                 .andExpect(status().isBadRequest());
@@ -83,11 +87,13 @@ class EmployeeControllerTest {
         when(employeeService.updateEmployee(eq(1L), any())).thenReturn(response);
 
         mockMvc.perform(put("/api/employees/1")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.salary").value(6000));
     }
+
     @Test
     void updateEmployee_InvalidPathId() throws Exception {
         EmployeeRequestDto requestDto = new EmployeeRequestDto(
@@ -102,11 +108,11 @@ class EmployeeControllerTest {
         );
 
         mockMvc.perform(put("/api/employees/invalid-id")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isBadRequest());
 
         verifyNoInteractions(employeeService);
     }
-    
 }
